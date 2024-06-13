@@ -4,6 +4,7 @@ import com.exemple.Projet42_api.DTO.EmailUpdateRequest;
 import com.exemple.Projet42_api.DTO.PasswordUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,9 +19,15 @@ import java.util.Map;
 public class UserController {
 
     private final KeycloakService keycloakService;
+    private final String clientId;
+    private final String clientSecret;
 
-    public UserController(KeycloakService keycloakService) {
+    public UserController(KeycloakService keycloakService,
+                          @Value("${keycloak.resource}") String clientId,
+                          @Value("${keycloak.client.secret}") String clientSecret) {
         this.keycloakService = keycloakService;
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
     }
 
     @GetMapping
@@ -65,6 +72,19 @@ public class UserController {
             return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Failed to change password"));
+        }
+    }
+
+    @PostMapping("/logout")
+    @Operation(summary = "Déconnecter l'utilisateur")
+    public ResponseEntity<?> logoutUser(@AuthenticationPrincipal Jwt jwt,
+                                        @RequestParam String refreshToken) {
+        boolean isLoggedOut = keycloakService.logoutUser(refreshToken, clientId, clientSecret);
+
+        if (isLoggedOut) {
+            return ResponseEntity.ok(Map.of("message", "Déconnexion réussie"));
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Erreur lors de la déconnexion"));
         }
     }
 }
