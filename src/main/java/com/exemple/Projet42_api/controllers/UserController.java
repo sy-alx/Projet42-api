@@ -4,7 +4,6 @@ import com.exemple.Projet42_api.DTO.EmailUpdateRequest;
 import com.exemple.Projet42_api.DTO.PasswordUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,15 +18,9 @@ import java.util.Map;
 public class UserController {
 
     private final KeycloakService keycloakService;
-    private final String clientId;
-    private final String clientSecret;
 
-    public UserController(KeycloakService keycloakService,
-                          @Value("${keycloak.resource}") String clientId,
-                          @Value("${keycloak.client.secret}") String clientSecret) {
+    public UserController(KeycloakService keycloakService) {
         this.keycloakService = keycloakService;
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
     }
 
     @GetMapping
@@ -42,19 +35,18 @@ public class UserController {
     }
 
     @PutMapping("/email")
-    @Operation(summary = "Mettre à jour l'adresse e-mail de l'utilisateur")
+    @Operation(summary = "Changer email de l'utilisateur connecté")
     public ResponseEntity<?> updateEmail(@AuthenticationPrincipal Jwt jwt,
                                          @RequestBody @Valid EmailUpdateRequest emailUpdateRequest) {
         String userId = jwt.getSubject();
         String newEmail = emailUpdateRequest.getNewEmail();
-        String userAccessToken = jwt.getTokenValue();
 
-        boolean isUpdated = keycloakService.updateUserEmail(userId, newEmail, userAccessToken);
+        boolean isUpdated = keycloakService.updateUserEmail(userId, newEmail);
 
         if (isUpdated) {
-            return ResponseEntity.ok(Map.of("message", "Email changé avec succès"));
+            return ResponseEntity.ok(Map.of("message", "Email changed successfully"));
         } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Email inchangé erreur rencontré"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Failed to change email"));
         }
     }
 
@@ -64,9 +56,8 @@ public class UserController {
                                             @RequestBody @Valid PasswordUpdateRequest passwordUpdateRequest) {
         String userId = jwt.getSubject();
         String newPassword = passwordUpdateRequest.getNewPassword();
-        String userAccessToken = jwt.getTokenValue();
 
-        boolean isUpdated = keycloakService.updateUserPassword(userId, newPassword, userAccessToken);
+        boolean isUpdated = keycloakService.updateUserPassword(userId, newPassword);
 
         if (isUpdated) {
             return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
@@ -79,7 +70,7 @@ public class UserController {
     @Operation(summary = "Déconnecter l'utilisateur")
     public ResponseEntity<?> logoutUser(@AuthenticationPrincipal Jwt jwt,
                                         @RequestParam String refreshToken) {
-        boolean isLoggedOut = keycloakService.logoutUser(refreshToken, clientId, clientSecret);
+        boolean isLoggedOut = keycloakService.logoutUser(refreshToken);
 
         if (isLoggedOut) {
             return ResponseEntity.ok(Map.of("message", "Déconnexion réussie"));
