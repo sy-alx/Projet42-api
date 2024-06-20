@@ -2,6 +2,7 @@ package com.exemple.Projet42_api.controllers;
 
 import com.exemple.Projet42_api.DTO.EmailUpdateRequest;
 import com.exemple.Projet42_api.DTO.PasswordUpdateRequest;
+import com.exemple.Projet42_api.DTO.UserRegistrationDto;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -10,6 +11,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import com.exemple.Projet42_api.services.KeycloakService;
+import com.exemple.Projet42_api.DTO.UserRegistrationDto;
+
 
 import java.util.Map;
 
@@ -76,6 +79,25 @@ public class UserController {
             return ResponseEntity.ok(Map.of("message", "Déconnexion réussie"));
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Erreur lors de la déconnexion"));
+        }
+    }
+
+
+    @PostMapping("/register")
+    @Operation(summary = "Créer un nouveau compte utilisateur")
+    public ResponseEntity<?> registerUser(@RequestBody @Valid UserRegistrationDto userRegistrationDto) {
+        boolean isCreated = keycloakService.createUser(
+                userRegistrationDto.getUsername(),
+                userRegistrationDto.getFirstName(),
+                userRegistrationDto.getLastName(),
+                userRegistrationDto.getEmail(),
+                userRegistrationDto.getPassword()
+        );
+
+        if (isCreated) {
+            return ResponseEntity.ok(Map.of("message", "User registered successfully"));
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Failed to register user"));
         }
     }
 }

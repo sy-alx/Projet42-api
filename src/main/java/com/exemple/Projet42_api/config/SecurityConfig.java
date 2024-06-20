@@ -20,7 +20,7 @@ public class SecurityConfig {
         http
                 .authorizeRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/user/register").permitAll() // Permettre l'accès sans authentification
                                 .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 ->
@@ -28,9 +28,10 @@ public class SecurityConfig {
                                 jwt.decoder(jwtDecoder())
                                         .jwtAuthenticationConverter(jwtAuthenticationConverter())
                         )
-                );
-
-        http.sessionManagement()
+                )
+                .csrf().ignoringRequestMatchers("/api/user/register") // Ignorer la protection CSRF pour cet endpoint
+                .and()
+                .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         return http.build();
@@ -52,5 +53,3 @@ public class SecurityConfig {
         return jwtAuthenticationConverter;
     }
 }
-
-

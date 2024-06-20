@@ -1,5 +1,7 @@
 package com.exemple.Projet42_api.services;
 
+import jakarta.ws.rs.core.Response;
+import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -63,6 +65,38 @@ public class KeycloakService {
             return true;
         } catch (Exception e) {
             logger.error("Failed to logout user", e);
+            return false;
+        }
+    }
+
+
+    public boolean createUser(String username, String firstName, String lastName, String email, String password) {
+        try {
+            UserRepresentation user = new UserRepresentation();
+            user.setUsername(username);
+            user.setFirstName(firstName);
+            user.setLastName(lastName);
+            user.setEmail(email);
+            user.setEnabled(true);
+            user.setEmailVerified(true);
+
+            Response response = keycloak.realm("projet42-realm").users().create(user);
+
+            if (response.getStatus() != 201) {
+                throw new RuntimeException("Failed to create user");
+            }
+
+            String userId = CreatedResponseUtil.getCreatedId(response);
+
+            CredentialRepresentation credential = new CredentialRepresentation();
+            credential.setType(CredentialRepresentation.PASSWORD);
+            credential.setValue(password);
+            credential.setTemporary(false);
+
+            keycloak.realm("projet42-realm").users().get(userId).resetPassword(credential);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
