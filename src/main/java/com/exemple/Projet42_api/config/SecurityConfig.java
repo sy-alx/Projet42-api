@@ -1,5 +1,7 @@
 package com.exemple.Projet42_api.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,12 +17,17 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        logger.info("Configuring security...");
         http
                 .authorizeRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/user/register").permitAll() // Permettre l'accès sans authentification
+                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/user/register").permitAll()
+                                .requestMatchers("/api/events/eventsSummarize").permitAll()
+                                .requestMatchers("/api/events/eventDetails/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 ->
@@ -29,11 +36,12 @@ public class SecurityConfig {
                                         .jwtAuthenticationConverter(jwtAuthenticationConverter())
                         )
                 )
-                .csrf().ignoringRequestMatchers("/api/user/register") // Ignorer la protection CSRF pour cet endpoint
+                .csrf().ignoringRequestMatchers("/api/user/register")
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
+        logger.info("Security configuration applied.");
         return http.build();
     }
 
