@@ -16,7 +16,10 @@ public class EventEntity {
     private String name;
     private String address;
     private String description;
+
+    @Column(columnDefinition = "TEXT")
     private String route;
+
     private LocalDate eventDate;
     private LocalTime eventTime;
 
