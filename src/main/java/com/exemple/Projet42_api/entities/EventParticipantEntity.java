@@ -14,7 +14,7 @@ public class EventParticipantEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long participantId;
+    private String participantId; // Changed to String
 
     @ManyToOne
     @JoinColumn(name = "event_id")
@@ -29,11 +29,11 @@ public class EventParticipantEntity {
         this.id = id;
     }
 
-    public Long getParticipantId() {
+    public String getParticipantId() {
         return participantId;
     }
 
-    public void setParticipantId(Long participantId) {
+    public void setParticipantId(String participantId) {
         this.participantId = participantId;
     }
 

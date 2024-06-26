@@ -2,9 +2,13 @@ package com.exemple.Projet42_api.controllers;
 
 import com.exemple.Projet42_api.DTO.EventSummaryDto;
 import com.exemple.Projet42_api.entities.EventEntity;
+import com.exemple.Projet42_api.entities.EventParticipantEntity;
+import com.exemple.Projet42_api.services.EventParticipantService;
 import com.exemple.Projet42_api.services.EventService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +20,8 @@ public class EventController {
     @Autowired
     private EventService eventService;
 
+    @Autowired
+    private EventParticipantService eventParticipantService;
 
 
     @PostMapping
@@ -40,5 +46,15 @@ public class EventController {
     @Operation(summary = "Get detailed information of an event by Id")
     public EventEntity getEventDetailsById(@PathVariable Long id) {
         return eventService.getEventById(id);
+    }
+
+    @PostMapping("/{eventId}/register")
+    @Operation(summary = "Register to an event")
+    public EventParticipantEntity registerToEvent(@PathVariable Long eventId, @AuthenticationPrincipal Jwt jwt) {
+        // Extract the user ID from the token (sub field)
+        String participantId = jwt.getSubject(); // Now it's a String
+
+        // Use the service to register the user to the event
+        return eventParticipantService.registerToEvent(eventId, participantId);
     }
 }
