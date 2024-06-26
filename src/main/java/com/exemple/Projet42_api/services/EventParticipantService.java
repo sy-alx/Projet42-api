@@ -26,4 +26,17 @@ public class EventParticipantService {
 
         return eventParticipantRepository.save(eventParticipant);
     }
+
+    public void unregisterFromEvent(Long eventId, String participantId) {
+        EventParticipantEntity eventParticipant = eventParticipantRepository
+                .findByEventIdAndParticipantId(eventId, participantId)
+                .orElseThrow(() -> new RuntimeException("Registration not found"));
+
+        eventParticipantRepository.delete(eventParticipant);
+    }
+
+    public boolean isRegisteredToEvent(Long eventId, String participantId) {
+        return eventParticipantRepository.findByEventIdAndParticipantId(eventId, participantId).isPresent();
+    }
+
 }

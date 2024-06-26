@@ -51,10 +51,21 @@ public class EventController {
     @PostMapping("/{eventId}/register")
     @Operation(summary = "Register to an event")
     public EventParticipantEntity registerToEvent(@PathVariable Long eventId, @AuthenticationPrincipal Jwt jwt) {
-        // Extract the user ID from the token (sub field)
         String participantId = jwt.getSubject(); // Now it's a String
-
-        // Use the service to register the user to the event
         return eventParticipantService.registerToEvent(eventId, participantId);
+    }
+
+    @DeleteMapping("/{eventId}/unregister")
+    @Operation(summary = "Unregister from an event")
+    public void unregisterFromEvent(@PathVariable Long eventId, @AuthenticationPrincipal Jwt jwt) {
+        String participantId = jwt.getSubject();
+        eventParticipantService.unregisterFromEvent(eventId, participantId);
+    }
+
+    @GetMapping("/{eventId}/isRegistered")
+    @Operation(summary = "Check if user is registered to an event")
+    public boolean isRegisteredToEvent(@PathVariable Long eventId, @AuthenticationPrincipal Jwt jwt) {
+        String participantId = jwt.getSubject();
+        return eventParticipantService.isRegisteredToEvent(eventId, participantId);
     }
 }
