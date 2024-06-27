@@ -1,12 +1,16 @@
 package com.exemple.Projet42_api.controllers;
 
+import com.exemple.Projet42_api.DTO.EventDateUpdateRequest;
+import com.exemple.Projet42_api.DTO.EventStatusUpdateRequest;
 import com.exemple.Projet42_api.DTO.EventSummaryDto;
+import com.exemple.Projet42_api.DTO.EventTimeUpdateRequest;
 import com.exemple.Projet42_api.entities.EventEntity;
 import com.exemple.Projet42_api.entities.EventParticipantEntity;
 import com.exemple.Projet42_api.services.EventParticipantService;
 import com.exemple.Projet42_api.services.EventService;
 import com.exemple.Projet42_api.services.FileStorageService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -89,5 +95,29 @@ public class EventController {
     public boolean isRegisteredToEvent(@PathVariable Long eventId, @AuthenticationPrincipal Jwt jwt) {
         String participantId = jwt.getSubject();
         return eventParticipantService.isRegisteredToEvent(eventId, participantId);
+    }
+
+    @PatchMapping("/{eventId}/updateEventDate")
+    @Operation(summary = "Update the event date")
+    public EventEntity updateEventDate(
+            @PathVariable Long eventId,
+            @Valid @RequestBody EventDateUpdateRequest updateRequest) {
+        return eventService.updateEventDate(eventId, updateRequest.getEventDate());
+    }
+
+    @PatchMapping("/{eventId}/updateEventTime")
+    @Operation(summary = "Update the event time")
+    public EventEntity updateEventTime(
+            @PathVariable Long eventId,
+            @Valid @RequestBody EventTimeUpdateRequest updateRequest) {
+        return eventService.updateEventTime(eventId, updateRequest.getEventTime());
+    }
+
+    @PatchMapping("/{eventId}/updateEventStatus")
+    @Operation(summary = "Update the event status")
+    public EventEntity updateEventStatus(
+            @PathVariable Long eventId,
+            @Valid @RequestBody EventStatusUpdateRequest updateRequest) {
+        return eventService.updateEventStatus(eventId, updateRequest.getStatusId());
     }
 }
