@@ -5,12 +5,16 @@ import com.exemple.Projet42_api.entities.EventEntity;
 import com.exemple.Projet42_api.entities.EventParticipantEntity;
 import com.exemple.Projet42_api.services.EventParticipantService;
 import com.exemple.Projet42_api.services.EventService;
+import com.exemple.Projet42_api.services.FileStorageService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -22,6 +26,9 @@ public class EventController {
 
     @Autowired
     private EventParticipantService eventParticipantService;
+
+    @Autowired
+    private FileStorageService fileStorageService;
 
 
     @PostMapping
@@ -49,17 +56,32 @@ public class EventController {
     }
 
     @PostMapping("/{eventId}/register")
-    @Operation(summary = "Register to an event")
-    public EventParticipantEntity registerToEvent(@PathVariable Long eventId, @AuthenticationPrincipal Jwt jwt) {
-        String participantId = jwt.getSubject(); // Now it's a String
-        return eventParticipantService.registerToEvent(eventId, participantId);
+    @Operation(summary = "Register to an event with a PDF file")
+    public ResponseEntity<String> registerToEvent(
+            @PathVariable Long eventId,
+            @RequestPart("file") MultipartFile file,
+            @AuthenticationPrincipal Jwt jwt) throws IOException {
+
+        String participantId = jwt.getSubject();
+        String userGivenName = jwt.getClaimAsString("given_name");
+        String userFamilyName = jwt.getClaimAsString("family_name");
+
+        // Renommage et stockage du fichier
+        String fileName = userFamilyName + "_" + userGivenName + "_" + eventId + ".pdf";
+        fileStorageService.store(file, fileName);
+
+        // Inscription à l'évènement
+        EventParticipantEntity participant = eventParticipantService.registerToEvent(eventId, participantId);
+        return ResponseEntity.ok("Registered to event with file: " + fileName);
     }
 
     @DeleteMapping("/{eventId}/unregister")
     @Operation(summary = "Unregister from an event")
     public void unregisterFromEvent(@PathVariable Long eventId, @AuthenticationPrincipal Jwt jwt) {
         String participantId = jwt.getSubject();
-        eventParticipantService.unregisterFromEvent(eventId, participantId);
+        String userGivenName = jwt.getClaimAsString("given_name");
+        String userFamilyName = jwt.getClaimAsString("family_name");
+        eventParticipantService.unregisterFromEvent(eventId, participantId, userGivenName, userFamilyName);
     }
 
     @GetMapping("/{eventId}/isRegistered")
