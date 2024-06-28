@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -98,6 +99,7 @@ public class EventController {
     }
 
     @PatchMapping("/{eventId}/updateEventDate")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update the event date")
     public EventEntity updateEventDate(
             @PathVariable Long eventId,
@@ -106,6 +108,7 @@ public class EventController {
     }
 
     @PatchMapping("/{eventId}/updateEventTime")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update the event time")
     public EventEntity updateEventTime(
             @PathVariable Long eventId,
@@ -114,6 +117,7 @@ public class EventController {
     }
 
     @PatchMapping("/{eventId}/updateEventStatus")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update the event status")
     public EventEntity updateEventStatus(
             @PathVariable Long eventId,
