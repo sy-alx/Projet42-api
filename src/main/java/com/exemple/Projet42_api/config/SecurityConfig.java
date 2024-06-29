@@ -47,10 +47,15 @@ public class SecurityConfig {
                                         .jwtAuthenticationConverter(jwtAuthenticationConverter())
                         )
                 )
-                .csrf().ignoringRequestMatchers("/api/user/register")
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/api/user/register",
+                                "/api/events/*/updateEventDate",
+                                "/api/events/*/updateEventTime",
+                                "/api/events/*/updateEventStatus")
+                )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                );
 
         logger.info("Security configuration applied.");
         return http.build();

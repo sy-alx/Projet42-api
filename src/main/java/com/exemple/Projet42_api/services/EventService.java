@@ -61,8 +61,10 @@ public class EventService {
     }
 
     public EventEntity updateEventStatus(Long eventId, Long statusId) {
-        EventEntity event = eventRepository.findById(eventId).orElseThrow(() -> new IllegalArgumentException("Event not found"));
-        StatusEntity status = statusRepository.findById(statusId).orElseThrow(() -> new IllegalArgumentException("Status not found"));
+        EventEntity event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found"));
+        StatusEntity status = statusRepository.findById(statusId)
+                .orElseThrow(() -> new RuntimeException("Status not found"));
         event.setStatus(status);
         return eventRepository.save(event);
     }
