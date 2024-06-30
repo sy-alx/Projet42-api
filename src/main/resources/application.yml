@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: Projet42-api
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://192.168.1.29:8090/realms/projet42-realm
+        registration:
+          keycloak:
+            client-id: projet42-api
+            client-secret: UjttrpYWQb78I0wVtlxTc3bHJnDM0zqc
+            scope: openid,profile,email
+            authorization-grant-type: authorization_code
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://192.168.1.29:8090/realms/projet42-realm/protocol/openid-connect/certs
+  datasource:
+    url: jdbc:postgresql://localhost:5433/projet42db
+    username: postgres
+    password: mysecretpassword
+    driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: always
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+keycloak:
+  realm: projet42-realm
+  auth-server-url: http://localhost:8090
+  resource: projet42-api
+  client:
+    secret: UjttrpYWQb78I0wVtlxTc3bHJnDM0zqc
+    id: admin-cli
+  admin:
+    username: admin
+    password: admin
+    client-id: admin-cli
+    client-secret: mItdGE3YNmGpg0TTIXp7qfglA9VQMFuO
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+  packages-to-scan: com.exemple.Projet42_api.controllers
+server:
+  port: 8080
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+        web: DEBUG
