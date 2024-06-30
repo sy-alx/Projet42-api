@@ -50,6 +50,12 @@ public class EventController {
         eventService.deleteEvent(id);
     }
 
+    @GetMapping("/nearestUpcomingEvent")
+    @Operation(summary = "Get the nearest upcoming event")
+    public EventSummaryDto getNearestUpcomingEvent() {
+        return eventService.getNearestUpcomingEvent();
+    }
+
     @GetMapping("/eventsSummarize")
     @Operation(summary = "View a summary list of available events")
     public List<EventSummaryDto> getAllEventSummaries() {
