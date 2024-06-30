@@ -39,6 +39,7 @@ public class SecurityConfig {
                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/user/register").permitAll()
                                 .requestMatchers("/api/events/eventsSummarize").permitAll()
                                 .requestMatchers("/api/events/eventDetails/**").permitAll()
+                                .requestMatchers("/api/events/nearestUpcomingEvent").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 ->

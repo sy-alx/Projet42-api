@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -67,5 +69,25 @@ public class EventService {
                 .orElseThrow(() -> new RuntimeException("Status not found"));
         event.setStatus(status);
         return eventRepository.save(event);
+    }
+
+    public EventSummaryDto getNearestUpcomingEvent() {
+        Optional<EventEntity> nearestEvent = eventRepository.findAll().stream()
+                .filter(event -> !event.getEventDate().isBefore(LocalDate.now())) // Including events happening today
+                .min(Comparator.comparing(EventEntity::getEventDate).thenComparing(EventEntity::getEventTime));
+
+        if (nearestEvent.isPresent()) {
+            EventEntity event = nearestEvent.get();
+            EventSummaryDto dto = new EventSummaryDto();
+            dto.setId(event.getId());
+            dto.setName(event.getName());
+            dto.setAddress(event.getAddress());
+            dto.setStatus(event.getStatus().getName());
+            dto.setEventDate(event.getEventDate());
+            dto.setEventTime(event.getEventTime());
+            return dto;
+        } else {
+            return null;
+        }
     }
 }
