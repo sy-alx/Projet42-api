@@ -130,4 +130,15 @@ public class EventController {
             @Valid @RequestBody EventStatusUpdateRequest updateRequest) {
         return eventService.updateEventStatus(eventId, updateRequest.getStatusId());
     }
+
+    @GetMapping("/checkRegistration")
+    @Operation(summary = "Check if user is registered to an event")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Boolean> checkUserRegistration(
+            @RequestParam Long eventId,
+            @RequestParam String userId
+    ) {
+        boolean isRegistered = eventParticipantService.isRegisteredToEvent(eventId, userId);
+        return ResponseEntity.ok(isRegistered);
+    }
 }
