@@ -26,8 +26,8 @@ public class OpenAPIConfig {
                                 .description("OAuth2 flow")
                                 .flows(new OAuthFlows()
                                         .authorizationCode(new OAuthFlow()
-                                                .authorizationUrl("http://192.168.1.29:8090/realms/projet42-realm/protocol/openid-connect/auth")
-                                                .tokenUrl("http://192.168.1.29:8090/realms/projet42-realm/protocol/openid-connect/token")
+                                                .authorizationUrl("http://10.43.250.30:9090/realms/projet42-realm/protocol/openid-connect/auth")
+                                                .tokenUrl("http://10.43.250.30:9090/realms/projet42-realm/protocol/openid-connect/token")
                                                 .scopes(new Scopes().addString("openid", "OpenID Connect scope"))))));
     }
 
