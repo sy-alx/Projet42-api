@@ -13,7 +13,7 @@ public class KeycloakConfig {
     @Bean
     public Keycloak keycloak() {
         return KeycloakBuilder.builder()
-                .serverUrl("http://10.43.250.30:9090")
+                .serverUrl("http://localhost:8090")
                 .realm("projet42-realm")
                 .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
                 .clientId("admin-cli")
